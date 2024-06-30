@@ -1,6 +1,5 @@
 from pymodbus.client import ModbusSerialClient as ModbusClient
 
-
 def write_single_register(client, address, value):
     response = client.write_register(address, value, slave=1)
     return response

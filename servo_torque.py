@@ -25,18 +25,18 @@ def main():
         return
 
     try:
-        # 1. Set velocity mode, PA_094=3
+        # 1. Set torque mode, PA_094=4
         address = 0x94
-        value = 0x03
+        value = 0x04
         response = write_single_register(client, address, value)
         if response.isError():
-            print("Failed to set velocity mode.")
+            print("Failed to set torque mode.")
         else:
-            print("Velocity mode set successfully.")
+            print("Torque mode set successfully.")
 
-        # 2. Set parameters: Acceleration time 200 (PA_09E=0x0000, PA09F=0x00C8), deceleration time 200 (PA_0A0=0x0000, PA0A1=0x00C8), target velocity 200 (PA_0A2=0x0000, PA0A3=0x00C8)
-        start_address = 0x9E
-        values = [0x0000, 0x00C8, 0x0000, 0x00C8, 0x0000, 0x00C8]
+        # 2. Set parameters: Target torque 300 (PA_0B3=0x012C), torque limit 3000 (PA_0B4=0x0BB8), target velocity 200 (PA_0A2=0x0000, PA0A3=0x00C8)
+        start_address = 0x0B3
+        values = [0x012C, 0x0BB8, 0x0000, 0x00C8]
         response = write_multiple_registers(client, start_address, values)
         if response.isError():
             print("Failed to set parameters.")
@@ -45,7 +45,7 @@ def main():
 
         # 3. Enable operation, PA_091=4
         address = 0x91
-        value = 0x04
+        value = 0x08
         response = write_single_register(client, address, value)
         if response.isError():
             print("Failed to set control mode.")
@@ -60,14 +60,14 @@ def main():
         else:
             print(f"Value read from PA_094 (System mode): {response.registers[0]}")
 
-        # 5. Read multiple registers from PA_09E to PA_A3
-        start_address = 0x9E
-        count = 6
+        # 5. Read multiple registers from PA_0B3 to PA_0A3
+        start_address = 0x0B3
+        count = 4
         response = read_multiple_registers(client, start_address, count)
         if response.isError():
-            print("Failed to read multiple registers from PA_9E to PA_A3.")
+            print("Failed to read multiple registers from PA_0B3 to PA_0A3.")
         else:
-            print(f"Values read from PA_9E to PA_A3: {response.registers}")
+            print(f"Values read from PA_0B3 to PA_0A3: {response.registers}")
 
         # 6. Read value from register PA_091 (Control status)
         address = 0x91
