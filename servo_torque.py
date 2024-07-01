@@ -34,18 +34,27 @@ def main():
         else:
             print("Torque mode set successfully.")
 
-        # 2. Set parameters: Target torque 300 (PA_0B3=0x012C), torque limit 3000 (PA_0B4=0x0BB8), target velocity 200 (PA_0A2=0x0000, PA0A3=0x00C8)
+        # 2. Set torque mode RPM limit, 200 PA_085=0xC8
+        address = 0x85
+        value = 0x32
+        response = write_single_register(client, address, value)
+        if response.isError():
+            print("Failed to set RPM limit mode.")
+        else:
+            print("RPM limit  set successfully.")
+
+        # 2. Set parameters: Target torque 20 (PA_0B3=0x0014), torque limit 100 (PA_0B4=0x0064), Feedback torque 0 (PA_0B5 = 0x0000), Torque gradient 100 (PA_0B6=0x0000, PA_0B7=0x0064)
         start_address = 0x0B3
-        values = [0x012C, 0x0BB8, 0x0000, 0x00C8]
+        values = [0x0014, 0x0064, 0x0000, 0x0064, 0x0000, 0x0064]
         response = write_multiple_registers(client, start_address, values)
         if response.isError():
             print("Failed to set parameters.")
         else:
             print("Parameters set successfully.")
 
-        # 3. Enable operation, PA_091=4
+        # 4. Enable operation, PA_091=0x40
         address = 0x91
-        value = 0x08
+        value = 0x40
         response = write_single_register(client, address, value)
         if response.isError():
             print("Failed to set control mode.")
@@ -60,14 +69,14 @@ def main():
         else:
             print(f"Value read from PA_094 (System mode): {response.registers[0]}")
 
-        # 5. Read multiple registers from PA_0B3 to PA_0A3
+        # 5. Read multiple registers from PA_0B3 to PA_0B7
         start_address = 0x0B3
         count = 4
         response = read_multiple_registers(client, start_address, count)
         if response.isError():
-            print("Failed to read multiple registers from PA_0B3 to PA_0A3.")
+            print("Failed to read multiple registers from PA_0B3 to PA_0B7.")
         else:
-            print(f"Values read from PA_0B3 to PA_0A3: {response.registers}")
+            print(f"Values read from PA_0B3 to PA_0B7: {response.registers}")
 
         # 6. Read value from register PA_091 (Control status)
         address = 0x91
@@ -77,29 +86,6 @@ def main():
         else:
             print(f"Value read from PA_091 (Control mode status): {response.registers[0]}")
 
-        # 7. Read value from register PA_03 (System status)
-        address = 0x03
-        response = read_register(client, address)
-        if response.isError():
-            print("Failed to read register PA_03 (System status).")
-        else:
-            print(f"Value read from PA_03 (System status): {response.registers[0]}")
-
-        # 8. Read value from register PA_08 (Driver Error Code)
-        address = 0x08
-        response = read_register(client, address)
-        if response.isError():
-            print("Failed to read register PA_08.")
-        else:
-            print(f"Value read from PA_08 (Driver Error Code): {response.registers[0]}")
-
-        # 9. Read value from register PA_11 (Given velocity)
-        address = 0x11
-        response = read_register(client, address)
-        if response.isError():
-            print("Failed to read register PA_11.")
-        else:
-            print(f"Value read from PA_11 (Given velocity): {response.registers[0]}")
 
     finally:
         client.close()

@@ -34,18 +34,18 @@ def main():
         else:
             print("Velocity mode set successfully.")
 
-        # 2. Set parameters: Acceleration time 200 (PA_09E=0x0000, PA09F=0x00C8), deceleration time 200 (PA_0A0=0x0000, PA0A1=0x00C8), target velocity 200 (PA_0A2=0x0000, PA0A3=0x00C8)
+        # 2. Set parameters: Acceleration time 100 (PA_09E=0x0000, PA09F=0x0064), deceleration time 100 (PA_0A0=0x0000, PA0A1=0x0064), target velocity 400 (PA_0A2=0x0000, PA0A3=0x0190)
         start_address = 0x9E
-        values = [0x0000, 0x00C8, 0x0000, 0x00C8, 0x0000, 0x00C8]
+        values = [0x0000, 0x0064, 0x0000, 0x0064, 0x0000, 0x0190]
         response = write_multiple_registers(client, start_address, values)
         if response.isError():
             print("Failed to set parameters.")
         else:
             print("Parameters set successfully.")
 
-        # 3. Enable operation, PA_091=4
+        # 3. Enable operation, PA_091=8
         address = 0x91
-        value = 0x04
+        value = 0x08
         response = write_single_register(client, address, value)
         if response.isError():
             print("Failed to set control mode.")
@@ -76,30 +76,6 @@ def main():
             print("Failed to read register PA_091 (Control mode status).")
         else:
             print(f"Value read from PA_091 (Control mode status): {response.registers[0]}")
-
-        # 7. Read value from register PA_03 (System status)
-        address = 0x03
-        response = read_register(client, address)
-        if response.isError():
-            print("Failed to read register PA_03 (System status).")
-        else:
-            print(f"Value read from PA_03 (System status): {response.registers[0]}")
-
-        # 8. Read value from register PA_08 (Driver Error Code)
-        address = 0x08
-        response = read_register(client, address)
-        if response.isError():
-            print("Failed to read register PA_08.")
-        else:
-            print(f"Value read from PA_08 (Driver Error Code): {response.registers[0]}")
-
-        # 9. Read value from register PA_11 (Given velocity)
-        address = 0x11
-        response = read_register(client, address)
-        if response.isError():
-            print("Failed to read register PA_11.")
-        else:
-            print(f"Value read from PA_11 (Given velocity): {response.registers[0]}")
 
     finally:
         client.close()

@@ -48,22 +48,6 @@ def main():
         else:
             print("Control mode set successfully.")
 
-        # 4. Read value from register PA_03 (System status)
-        address = 0x03
-        response = read_register(client, address)
-        if response.isError():
-            print("Failed to read register PA_03 (System status).")
-        else:
-            print(f"Value read from PA_03 (System status): {response.registers[0]}")
-
-        # 5. Read value from register PA_08 (Driver Error Code)
-        address = 0x08
-        response = read_register(client, address)
-        if response.isError():
-            print("Failed to read register PA_08.")
-        else:
-            print(f"Value read from PA_08 (Driver Error Code): {response.registers[0]}")
-
     finally:
         client.close()
 
